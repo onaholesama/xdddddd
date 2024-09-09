@@ -1,10 +1,7 @@
 // Import necessary packages
 const express = require('express');
 const path = require('path');
-const puppeteer = require('puppeteer');
 const fs = require('fs');
-const fetch = require('node-fetch');
-const FormData = require('form-data');
 
 // Initialize Express app
 const app = express();
@@ -17,10 +14,6 @@ app.set('view engine', 'ejs');
 
 // Use the public directory for static files
 app.use(express.static(path.join(__dirname, 'public')));
-
-const allLocations = ['beach', 'room'];
-const allExpressions = ['nervous', 'laughing', 'disappointed', 'mortified', 'smile', 'beaming', 'neutral', 'elated', 'flustered', 'exasperated', 'skeptical', 'embarrassed', 'awkward', 'Admiration'];
-const nudeStates = ['true', 'false'];
 
 app.get('/balls', async (req, res) => {
   let location = req.query.location;
@@ -39,86 +32,9 @@ app.get('/balls', async (req, res) => {
       }
     }
   }
-
-  // If we didn't find an existing render, make a new one
-  if (!url) {
-    // Use Puppeteer to capture a screenshot
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-
-    await page.setViewport({
-      width: 700,
-      height: 512
-    });
-
-    await page.goto(`http://localhost:3000/render?location=${location}&expression=${expression}&nude=${nude}`, {
-      waitUntil: 'networkidle2',
-    });
-
-    const screenshotBuffer = await page.screenshot();
-
-    await browser.close();
-
-    // Upload to Catbox
-    const form = new FormData();
-    form.append('reqtype', 'fileupload');
-    form.append('userhash', '');
-    form.append('fileToUpload', screenshotBuffer, {
-      filename: `screenshot_${expression}_${nude}.png`,
-      contentType: 'image/png'
-    });
-
-    const catboxResponse = await fetch('https://catbox.moe/user/api.php', {
-      method: 'POST',
-      body: form
-    });
-
-    url = await catboxResponse.text();
-
-    // Store the render for these parameters
-    fs.appendFileSync(renderFile, `${location}|${expression}|${nude}|${url}\r\n`, 'utf-8');
-  }
-
   // Redirect to the URL of the image
   res.redirect(url);
 });
-
-app.get('/render', (req, res) => {
-  let location = req.query.location;
-  let expression = req.query.expression;
-  let nude = req.query.nude; // Keep it as a string
-
-  res.render('index', {location: location, expression: expression, nude}); // Convert string to boolean only when rendering
-});
-
-app.get('/batchrender', async (req, res) => {
-  for (let location of allLocations) {
-    for (let expression of allExpressions) {
-      for (let nude of nudeStates) {
-        const url = `http://localhost:3000/?location=${location}&expression=${expression}&nude=${nude}`
-
-        // Visit each URL in headless browser
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-
-        await page.setViewport({
-          width: 700,
-          height: 512
-        });
-
-        await page.goto(url, {
-          waitUntil: 'networkidle2',
-        });
-
-        // Close the headless browser after each render to save resources.
-        await browser.close();
-      }
-    }
-  }
-
-  res.send('Done batch rendering!');
-});
-
 // Listen on port 3000
 app.listen(3000, () => {
   console.log("Server started on port 3000.");
