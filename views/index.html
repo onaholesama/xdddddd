@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameScreen Dev</title>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+
+  <style>
+    .game-screen::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-size: cover;
+    }
+
+    .character {
+      background-position-x: 95%;
+      background-position-y: 100%;
+      background-size: 120%;
+      background-repeat: no-repeat;
+    }
+
+    .game-container {
+        position: relative; /* Ensures that absolute children are positioned correctly */
+    }
+  </style>
+
+</head>
+<body>
+
+<div class="game-container">
+   <div class="game-screen"></div>
+   <div class="character"></div>
+</div>
+
+<script>
+  const location = 'forest'; // Change as needed
+  const nude = false;        // Change as needed
+  const expression = 'happy';// Change as needed
+
+  // Update game screen background based on location
+  const gameScreen = document.querySelector('.game-screen');
+  gameScreen.style.backgroundImage = `url('/images/locations/${location}.png')`;
+
+  // Update character appearance based on expression and nude boolean
+  const characterDiv = document.querySelector('.character');
+
+  let nsfwPath = nude ? 'nsfw' : '';
+
+  characterDiv.style.backgroundImage = `url('/images/expressions/${nsfwPath}/${expression}.png')`;
+</script>
+
+</body>
+</html>

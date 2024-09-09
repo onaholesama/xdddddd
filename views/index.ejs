@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GameScreen Dev</title>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+
+  <style>
+      .game-screen::before{
+          background-image:url('/images/locations/<%= location %>.png');
+      }
+
+      .character{
+          background-image:url('/images/expressions/<%= nude === 'true' ? 'nsfw' : '' %>/<%= expression %>.png');
+		  background-position-x: 95%;
+		  background-position-y: 100%;
+		  background-size: 120%;
+		  background-repeat: no-repeat;
+      }
+  </style>
+
+</head>
+<body>
+<div class="game-screen">
+   <div class="character"></div>
+</div>
+</body>
+</html>
